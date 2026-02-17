@@ -1,3 +1,4 @@
+OPTIONS (SKIP=1)
 LOAD DATA
 INFILE 'clean_dataset_processed.csv'
 INTO TABLE flights_raw

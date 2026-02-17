@@ -8,6 +8,8 @@ bdf = pd.DataFrame(bdata)
 cdf = pd.DataFrame(cdata)
 edf = pd.DataFrame(edata)
 
+
+print(cdf.head())
 '''
 print("Businnes.csv:\n")
 print(bdf.head())
