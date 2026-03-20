@@ -199,3 +199,115 @@ SELECT category, SUM(amount)
 FROM Expense
 WHERE trip_id = 1
 GROUP BY category;
+
+--recent entries
+SELECT * FROM expense
+ORDER BY created_at DESC
+LIMIT 5;
+
+
+SELECT city_id, city_name FROM City WHERE city_name = :source OR city_name = :destination;
+
+--flights between two cities
+SELECT f.flight_id, f.flight_number, a.airline_name,
+       cs.city_name AS source, cd.city_name AS destination,
+       fs.departure_time, fs.arrival_time, fs.duration, fs.stops
+FROM Flight f
+JOIN Airline a ON f.airline_id = a.airline_id
+JOIN Flight_Schedule fs ON f.flight_id = fs.flight_id
+JOIN City cs ON fs.source_city_id = cs.city_id
+JOIN City cd ON fs.destination_city_id = cd.city_id
+WHERE cs.city_name = :source
+  AND cd.city_name = :destination;
+
+--insert user
+INSERT INTO App_User
+VALUES (user_seq.NEXTVAL, :name, :email, :password);
+
+select * from app_user
+
+--trip planning
+INSERT INTO Trip
+VALUES (trip_seq.NEXTVAL, :user_id, :source, :destination,
+        TO_DATE(:departure_date,'DD/MM/YYYY'), TO_DATE(:return_date,'DD/MM/YYYY'), :budget);
+
+SELECT * from city
+
+select * from trip
+
+--view user trips
+SELECT t.trip_id, cs.city_name AS source, cd.city_name AS destination,
+       t.departure_date, t.return_date, t.total_budget
+FROM Trip t
+JOIN City cs ON t.source_city_id = cs.city_id
+JOIN City cd ON t.destination_city_id = cd.city_id
+WHERE t.user_id = :user_id;
+
+--add expense
+INSERT INTO Expense
+VALUES (
+  expense_seq.NEXTVAL,
+  :trip_id,
+  :category,
+  :amount,
+  TO_DATE(:expense_date, 'DD/MM/YY'),
+  :description
+);
+
+select * from expense
+--view expenses of a trip
+SELECT category, amount, expense_date, description
+FROM Expense
+WHERE trip_id = :trip_id
+ORDER BY expense_date;
+
+--total spent vs budget
+SELECT t.total_budget,
+       NVL(SUM(e.amount), 0) AS total_spent,
+       (t.total_budget - NVL(SUM(e.amount), 0)) AS remaining_budget
+FROM Trip t
+LEFT JOIN Expense e ON t.trip_id = e.trip_id
+WHERE t.trip_id = :trip_id
+GROUP BY t.total_budget;
+
+--expenses by category
+SELECT category, SUM(amount) AS total
+FROM Expense
+WHERE trip_id = :trip_id
+GROUP BY category;
+
+--most expensive flights
+SELECT f.flight_number, MAX(fr.price) AS max_price
+FROM Flight f
+JOIN Flight_Schedule fs ON f.flight_id = fs.flight_id
+JOIN Fare fr ON fs.schedule_id = fr.schedule_id
+GROUP BY f.flight_number
+ORDER BY max_price DESC;
+
+--popular routes? nvm its based on the app user trips 
+SELECT cs.city_name AS source, cd.city_name AS destination, COUNT(*) AS trips
+FROM Trip t
+JOIN City cs ON t.source_city_id = cs.city_id
+JOIN City cd ON t.destination_city_id = cd.city_id
+GROUP BY cs.city_name, cd.city_name
+ORDER BY trips DESC;
+
+--filters for frontend
+SELECT * FROM Fare
+WHERE price BETWEEN :min_price AND :max_price;
+
+--direct flights aka no stops
+SELECT * FROM Flight_Schedule
+WHERE stops = 'zero';
+
+--flights within budget
+SELECT fs.schedule_id, fr.price
+FROM Flight_Schedule fs
+JOIN Fare fr ON fs.schedule_id = fr.schedule_id
+JOIN Trip t ON t.source_city_id = fs.source_city_id
+WHERE fr.price <= t.total_budget;
+
+--upcoming trips?
+SELECT * FROM Trip
+WHERE departure_date > SYSDATE
+ORDER BY departure_date;
