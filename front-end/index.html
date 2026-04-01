@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wander — Travel & Flight Fare Analysis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<nav id="navbar" style="display:none">
+  <div class="logo">wan<span>der</span></div>
+  <div class="nav-links">
+    <button class="nl" onclick="showPage('dashboard')">⊞ Dashboard</button>
+    <button class="nl" onclick="showPage('flights')">✈ Flights</button>
+    <button class="nl" onclick="showPage('trips')">🗺 My Trips</button>
+  </div>
+  <div class="nav-user">
+    <div class="avatar" id="navAv">?</div>
+    <span id="navName"></span>
+    <button class="nl logout" onclick="logout()">Sign out</button>
+  </div>
+</nav>
+
+<!-- LOGIN -->
+<div id="page-login" class="auth-wrap">
+  <div class="auth-left">
+    <div class="auth-left-content">
+      <div class="auth-badge">✈ Travel & Fare Analysis System</div>
+      <h1>Your next<br/>adventure<br/>awaits.</h1>
+      <p>Search flights, plan trips, and track every rupee — all in one place.</p>
+      <div class="auth-pills">
+        <span>Mumbai → Delhi</span>
+        <span>Bangalore → Chennai</span>
+        <span>Kolkata → Hyderabad</span>
+      </div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-box">
+      <h2>Welcome back</h2>
+      <p class="auth-sub">Sign in to continue planning</p>
+      <div class="tabs">
+        <button class="tb active" id="tin" onclick="switchTab('in')">Sign In</button>
+        <button class="tb" id="tup" onclick="switchTab('up')">Register</button>
+      </div>
+      <div id="form-in">
+        <div class="fg"><label>Email</label><input type="email" id="li-e" placeholder="you@example.com"/></div>
+        <div class="fg"><label>Password</label><input type="password" id="li-p" placeholder="••••••••"/></div>
+        <button class="btn-primary" onclick="doLogin()">Sign In →</button>
+        <div class="errmsg" id="li-err"></div>
+      </div>
+      <div id="form-up" style="display:none">
+        <div class="fg"><label>Full Name</label><input type="text" id="ru-n" placeholder="Aryan Sharma"/></div>
+        <div class="fg"><label>Email</label><input type="email" id="ru-e" placeholder="you@example.com"/></div>
+        <div class="fg"><label>Password</label><input type="password" id="ru-p" placeholder="Min 6 characters"/></div>
+        <button class="btn-primary" onclick="doRegister()">Create Account →</button>
+        <div class="errmsg" id="ru-err"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="page-dashboard" class="page" style="display:none">
+  <div class="ph">
+    <h2 id="dash-greeting">Good morning</h2>
+    <p>Here's your travel summary</p>
+  </div>
+
+  <div class="dash-stats" id="dash-stats"></div>
+
+  <div class="dash-row">
+    <div class="dash-col-wide">
+      <div class="card pad">
+        <div class="section-head">Recent Trips</div>
+        <div id="dash-trips"></div>
+      </div>
+    </div>
+    <div class="dash-col-narrow">
+      <div class="card pad">
+        <div class="section-head">Spending by Category</div>
+        <div class="pie-wrap">
+          <svg id="dash-pie" width="120" height="120" viewBox="0 0 120 120"></svg>
+          <div class="pie-legend" id="dash-pie-legend"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dash-row">
+    <div class="dash-col-narrow">
+      <div class="card pad">
+        <div class="section-head">Budget vs Spent</div>
+        <div class="bar-chart" id="dash-bar"></div>
+        <div class="bar-legend">
+          <span><span class="leg-dot" style="background:var(--mist)"></span>Budget</span>
+          <span><span class="leg-dot" style="background:var(--clay)"></span>Spent</span>
+        </div>
+      </div>
+    </div>
+    <div class="dash-col-wide">
+      <div class="card pad">
+        <div class="section-head">Expense Timeline <span class="section-sub">— all trips, sorted by date</span></div>
+        <div id="dash-timeline"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FLIGHTS -->
+<div id="page-flights" class="page" style="display:none">
+  <div class="ph"><h2>Find Flights</h2><p>Search routes and compare fares across all airlines</p></div>
+  <div class="card search-card">
+    <div class="search-grid">
+      <div class="fg"><label>From</label>
+        <select id="s-src">
+          <option value="">Any city</option>
+          <option>Bangalore</option><option>Chennai</option><option>Delhi</option>
+          <option>Hyderabad</option><option>Kolkata</option><option>Mumbai</option>
+        </select>
+      </div>
+      <div class="fg"><label>To</label>
+        <select id="s-dst">
+          <option value="">Any city</option>
+          <option>Bangalore</option><option>Chennai</option><option>Delhi</option>
+          <option>Hyderabad</option><option>Kolkata</option><option>Mumbai</option>
+        </select>
+      </div>
+      <div class="fg"><label>Class</label>
+        <select id="s-cls">
+          <option value="">Any</option>
+          <option>Economy</option><option>Business</option><option>First</option>
+        </select>
+      </div>
+      <div class="fg"><label>Stops</label>
+        <select id="s-stp">
+          <option value="">Any</option>
+          <option value="zero">Direct only</option>
+          <option value="one">1 Stop</option>
+          <option value="two_or_more">2+ Stops</option>
+        </select>
+      </div>
+      <div class="fg"><label>Max Price (₹)</label>
+        <input type="number" id="s-price" placeholder="e.g. 5000"/>
+      </div>
+      <button class="btn-search" onclick="searchFlights()">Search Flights</button>
+    </div>
+  </div>
+  <div id="fres"></div>
+</div>
+
+<!-- TRIPS + EXPENSES -->
+<div id="page-trips" class="page" style="display:none">
+  <div class="ph"><h2>My Trips</h2><p>Click a trip to view and manage its expenses</p></div>
+  <div class="trip-grid" id="tgrid"></div>
+
+  <div id="exp-panel" style="display:none">
+    <div class="exp-panel-header">
+      <div class="section-head" style="margin:0">Expenses — <span class="highlight" id="exp-trip-label"></span></div>
+    </div>
+    <div class="budget-row" id="budget-row"></div>
+    <div class="exp-layout">
+      <div class="exp-chart-col">
+        <div class="card pad">
+          <div class="section-head" style="margin-bottom:16px">By Category</div>
+          <svg id="exp-pie" width="110" height="110" viewBox="0 0 110 110"></svg>
+          <div id="exp-pie-legend" style="margin-top:14px"></div>
+        </div>
+      </div>
+      <div class="exp-table-col">
+        <div class="card" style="overflow:hidden">
+          <table class="etable">
+            <thead>
+              <tr><th>Category</th><th>Description</th><th>Date</th><th>Amount</th><th></th>
+            </thead>
+            <tbody id="exp-body"></tbody>
+          </table>
+          <div class="add-exp-row">
+            <select id="ec">
+              <option>Food</option><option>Transport</option><option>Hotel</option>
+              <option>Activity</option><option>Misc</option>
+            </select>
+            <input type="text" id="ed" placeholder="Description"/>
+            <input type="number" id="ea" placeholder="Amount (₹)"/>
+            <input type="date" id="edt"/>
+            <button class="btn-add" onclick="addExpense()">+ Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD TRIP MODAL -->
+<div class="modal-overlay" id="tmod">
+  <div class="modal">
+    <h3>Plan a New Trip</h3>
+    <div class="modal-grid">
+      <div class="fg"><label>From</label>
+        <select id="ms">
+          <option>Bangalore</option><option>Chennai</option><option>Delhi</option>
+          <option>Hyderabad</option><option>Kolkata</option><option>Mumbai</option>
+        </select>
+      </div>
+      <div class="fg"><label>To</label>
+        <select id="md2">
+          <option>Mumbai</option><option>Bangalore</option><option>Chennai</option>
+          <option>Delhi</option><option>Hyderabad</option><option>Kolkata</option>
+        </select>
+      </div>
+      <div class="fg"><label>Departure</label><input type="date" id="mdep"/></div>
+      <div class="fg"><label>Return</label><input type="date" id="mret"/></div>
+      <div class="fg full"><label>Total Budget (₹)</label><input type="number" id="mbgt" placeholder="e.g. 25000"/></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveTrip()">Create Trip →</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="tst"></div>
+<script src="app.js"></script>
+</body>
+</html>
