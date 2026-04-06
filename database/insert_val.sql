@@ -57,7 +57,6 @@ FROM (
     JOIN City cd
         ON fr.destination_city = cd.city_name
 ) x;
-
 INSERT INTO Fare (
     fare_id,
     schedule_id,
@@ -311,3 +310,8 @@ WHERE fr.price <= t.total_budget;
 SELECT * FROM Trip
 WHERE departure_date > SYSDATE
 ORDER BY departure_date;
+
+SELECT owner, table_name
+FROM all_tables
+
+select * from app_user

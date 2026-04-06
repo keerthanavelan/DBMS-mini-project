@@ -741,7 +741,7 @@ def add_expense():
         connection.commit()
         
         response_data = {
-            'expense_id': int(expense_id.getvalue())
+            'expense_id': int(expense_id.getvalue()[0])
         }
         
         return format_response(True, data=response_data, message='Expense added successfully')
